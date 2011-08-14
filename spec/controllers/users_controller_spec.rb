@@ -53,6 +53,31 @@ describe UsersController do
                                            :content => "Next")
       end
     end
+	
+    describe "as a non-admin user" do
+      before(:each) do
+        @user = Factory(:user)
+      end
+
+	  it "should not exist a link to delete" do
+	    test_sign_in(@user)
+		get :index
+		response.should_not have_selector("a", 'data-method' =>"delete", :content => "delete")
+	  end
+    end
+
+    describe "as an admin user" do
+
+      before(:each) do
+        admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(admin)
+      end
+
+	  it "should exist a link to delete" do
+	    get :index
+		response.should have_selector("a", 'data-method' =>"delete", :content => "delete")
+	  end
+    end	
   end
   
   describe "GET 'new'" do
@@ -85,6 +110,18 @@ describe UsersController do
 	  get :new
 	  response.should have_selector("input[name='user[password_confirmation]'][type='password']")
 	end	
+	
+	describe "for signed in users" do
+	  before(:each) do
+	    @user = Factory(:user)
+		test_sign_in(@user)
+	  end
+	  
+	  it "should redirect to the root page" do
+	    get :new
+		response.should redirect_to(root_url)
+	  end
+	end
   end
   
   describe "GET 'show'" do
@@ -143,6 +180,8 @@ describe UsersController do
         post :create, :user => @attr
         response.should render_template('new')
       end  
+	  
+	  
     end
 	
 	describe "failure invalid values" do
@@ -191,6 +230,21 @@ describe UsersController do
         controller.should be_signed_in
       end	  
     end
+	
+	describe "for signed in users" do
+	  before(:each) do
+	    @user = Factory(:user)
+	    test_sign_in(@user)
+		@attr = { :name => "New User", :email => "user@example.com",
+                  :password => "foobar", :password_confirmation => "foobar" }
+	  end
+	  
+	  it "should redirect to the root page" do
+	    post :create, :user => @attr
+		response.should redirect_to(root_url)
+	  end
+	end	
+	
   end  
   
   describe "GET 'edit'" do
@@ -325,13 +379,18 @@ describe UsersController do
         delete :destroy, :id => @user
         response.should redirect_to(root_path)
       end
+	  
+	  it "should not exist a link to delete" do
+	    test_sign_in(@user)
+		
+	  end
     end
 
     describe "as an admin user" do
 
       before(:each) do
-        admin = Factory(:user, :email => "admin@example.com", :admin => true)
-        test_sign_in(admin)
+        @admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(@admin)
       end
 
       it "should destroy the user" do
@@ -344,6 +403,12 @@ describe UsersController do
         delete :destroy, :id => @user
         response.should redirect_to(users_path)
       end
+	  
+	  it "should not destroy itself" do
+	    lambda do
+		  delete :destroy, :id => @admin
+		end.should_not change(User, :count)
+	  end
     end
   end  
 end
