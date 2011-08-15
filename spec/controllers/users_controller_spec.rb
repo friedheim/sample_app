@@ -162,6 +162,19 @@ describe UsersController do
       response.should have_selector("span.content", :content => mp1.content)
       response.should have_selector("span.content", :content => mp2.content)
     end	
+	
+	describe "logged in user" do
+	  before(:each) do
+	    test_sign_in(@user)
+	  end
+	
+	  it "should not exist delete link for other user's microposts" do
+	    other_user = Factory(:user, :email => "otherrr_user@example.net")
+		other_user.microposts.create!(:content => "my message")
+		get :show, :id => other_user
+		response.should_not have_selector("a", 'data-method' =>"delete", :content => "delete")
+	  end
+	end
   end
   
   describe "POST 'create'" do

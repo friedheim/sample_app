@@ -36,5 +36,22 @@ describe "Microposts" do
         end.should change(Micropost, :count).by(1)
       end
     end
+	
+    describe "micropost count in sidebar" do
+
+      it "should have right number of microposts and correct pluralization" do
+        content = "Lorem ipsum dolor sit amet"
+        #lambda do
+          visit root_path
+		  response.should have_selector("span.microposts", :content => "0 microposts")
+          fill_in :micropost_content, :with => content
+          click_button
+          response.should have_selector("span.microposts", :content => "1 micropost")
+          fill_in :micropost_content, :with => content
+          click_button
+          response.should have_selector("span.microposts", :content => "2 microposts")
+        #end.should change(Micropost, :count).by(2)
+      end
+    end	
   end
 end
