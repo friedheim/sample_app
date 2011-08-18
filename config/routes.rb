@@ -1,11 +1,19 @@
 SampleApp::Application.routes.draw do
 
+#solamente un exercicio
+
+#resources :users do
+#  resources :microposts, :only => :index
+#end
 
 resources :users do
-  resources :microposts, :only => :index
+  member do
+    get :following, :followers
+  end
 end
 resources :sessions,   :only => [:new, :create, :destroy]
 resources :microposts, :only => [:create, :destroy]
+resources :relationships, :only => [:create, :destroy]
 
 #  get "sessions/new"
 #  get "users/new"
