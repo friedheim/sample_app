@@ -280,5 +280,19 @@ describe User do
       @user.follow!(@followed)
       @followed.followers.should include(@user)
     end  
+	
+	it "should remove relationships when destroying user" do
+	  @user.follow!(@followed)
+	  relationship = @user.relationships.first
+	  @user.destroy
+	  Relationship.find_by_id(relationship.id).should be_nil
+	end
+	
+	it "should remove relationships when destroying followed" do
+	  @user.follow!(@followed)
+	  relationship = @user.relationships.first
+	  @followed.destroy
+	  Relationship.find_by_id(relationship.id).should be_nil	
+	end
   end
 end

@@ -56,17 +56,11 @@ class UsersController < ApplicationController
   end
   
   def following
-    @title = "Following"
-    @user = User.find(params[:id])
-    @users = @user.following.paginate(:page => params[:page])
-    render 'show_follow'
+	show_follow(:following)
   end
 
   def followers
-    @title = "Followers"
-    @user = User.find(params[:id])
-    @users = @user.followers.paginate(:page => params[:page])
-    render 'show_follow'
+    show_follow(:followers)
   end  
   
   private
@@ -87,5 +81,12 @@ class UsersController < ApplicationController
 	def destroy_self
 	  @user_to_destroy = User.find(params[:id])
 	  redirect_to(root_path) if current_user?(@user_to_destroy)
+	end
+	
+	def show_follow(action)
+      @title = action.to_s.capitalize
+	  @user = User.find(params[:id])
+      @users = @user.send(action).paginate(:page => params[:page])
+      render 'show_follow'	  
 	end
 end

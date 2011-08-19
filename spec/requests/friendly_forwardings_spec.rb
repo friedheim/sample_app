@@ -11,4 +11,9 @@ describe "FriendlyForwardings" do
     # The test follows the redirect again, this time to users/edit.
     response.should render_template('users/edit')
   end
+    
+ # describe "follow a user" do
+    #visit edit_user_path(Factory(:user))
+	#click_button
+ # end  
 end
